@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <zinx.h>
+#include <vector>
+#include <list>
+
 using namespace std;
 
 class ZinxTimer
@@ -37,3 +40,33 @@ public:
     int m_TimerFd = -1;
 };
 
+class TimerOutProc
+{
+public:
+TimerOutProc(){};
+virtual ~TimerOutProc(){};
+   virtual void Proc() =0;
+   virtual int GetTimeSec() =0;
+   // 所剩圈数
+   int iCount = -1;
+};
+
+class TimerOutMsg :public AZinxHandler{
+    //std::list<TimerOutProc*> m_task_list;
+    vector<list<TimerOutProc*>> m_timer_wheel;
+    int cur_index = 0;
+    static TimerOutMsg single;
+    TimerOutMsg();
+public:
+
+    ~TimerOutMsg(){}
+    /*信息处理函数，开发者重写该函数实现信息的处理，当有需要一个环节继续处理时，应该创建新的信息对象（堆对象）并返回指针*/
+	virtual IZinxMsg *InternelHandle(IZinxMsg &_oInput);
+	/*获取下一个处理环节函数，开发者重写该函数，可以指定当前处理环节结束后下一个环节是什么，通过参数信息对象，可以针对不同情况进行分别处理*/
+	virtual AZinxHandler *GetNextHandler(IZinxMsg &_oNextMsg);
+    void AddTask(TimerOutProc* _ptask);
+    void DelTask(TimerOutProc *_ptask);
+    static TimerOutMsg &GetInstance(){
+        return single;
+    }
+};

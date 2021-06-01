@@ -1,6 +1,9 @@
 #include "ZinxTimer.h"
 #include <sys/timerfd.h>
 
+TimerOutMsg TimerOutMsg::single;
+
+
 bool ZinxTimer::Init(){
     // 创建文件描述符
     bool bRet = false;        
@@ -8,7 +11,7 @@ bool ZinxTimer::Init(){
     if(0 <= iFd)
     {
         struct itimerspec period = {
-            {5,0},{5,0}
+            {1,0},{1,0}
         };
         if(0 == timerfd_settime(iFd,0,&period,NULL))
         {
@@ -76,5 +79,84 @@ public:
 }*pout_hello = new Output_hello();
 
 AZinxHandler *ZinxTimer::GetInputNextStage(BytesMsg &_oInput){
-    return pout_hello;
+    return &TimerOutMsg::GetInstance();
 }
+
+IZinxMsg *TimerOutMsg::InternelHandle(IZinxMsg &_oInput){
+    /*
+    for (auto task:m_task_list)
+    {
+        task->iCount--;
+        // 若计数为0则调用超时处理函数
+        if(task->iCount <= 0)
+        {
+            task->Proc();
+            task->iCount = task->GetTimeSec();
+        }
+    }
+    */
+    // 移动刻度
+    cur_index++;
+    cur_index %=10;
+    // 判断当前刻度所有节点，指向处理函数或者圈数-1
+    for(auto itr = m_timer_wheel[cur_index].begin();itr!= m_timer_wheel[cur_index].end();itr++)
+    {
+        if((*itr)->iCount <=0)
+        {
+            (*itr)->Proc();
+            auto tmp=(*itr);
+            itr=m_timer_wheel[cur_index].erase(itr);
+            AddTask(tmp);
+        }else{
+            (*itr)->iCount--;
+            ++itr;
+        }
+    }
+    return NULL;
+}
+
+AZinxHandler *TimerOutMsg::GetNextHandler(IZinxMsg &_oNextMsg){
+    return NULL;
+}
+
+TimerOutMsg::TimerOutMsg(){
+    // 创建10个齿
+    for (int i=0;i<10;++i)
+    {
+        list<TimerOutProc*> tmp;
+        m_timer_wheel.push_back(tmp);
+    }
+}
+void TimerOutMsg::AddTask(TimerOutProc* _ptask)
+{
+    /*
+    m_task_list.push_back(_ptask);
+    _ptask->iCount = _ptask->GetTimeSec();
+    */
+   /* 
+    * 计算当前任务需要放到那个齿上
+    * 把任务存到该齿上
+    * 计算所需圈数
+    */
+    int index = (_ptask->GetTimeSec()+cur_index)%10;
+    m_timer_wheel[index].push_back(_ptask);
+    _ptask->iCount = _ptask->GetTimeSec()/10;
+}
+
+void TimerOutMsg::DelTask(TimerOutProc *_ptask)
+{
+    // m_task_list.remove(_ptask);
+    // 遍历时间所有齿，删掉任务    
+   for (auto chi:m_timer_wheel)
+   {
+    for(auto task:chi)   
+    {
+        if(task == _ptask)
+        {
+            chi.remove(_ptask);
+            return;
+        }
+    }
+   }
+}
+
