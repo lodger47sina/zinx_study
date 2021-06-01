@@ -13,6 +13,7 @@ public:
         auto pchannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
         std::string output = "hello world";
         ZinxKernel::Zinx_SendOut(output,*pchannel);
+        TimerOutMsg::GetInstance().DelTask(this);
     }
     virtual int GetTimeSec(){
         return 3;
@@ -27,6 +28,7 @@ public:
         auto pchannel = ZinxKernel::Zinx_GetChannel_ByInfo("stdout");
         std::string output = "bye";
         ZinxKernel::Zinx_SendOut(output,*pchannel);
+        TimerOutMsg::GetInstance().DelTask(this);
     }
     virtual int GetTimeSec(){
         return 5;

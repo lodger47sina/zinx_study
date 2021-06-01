@@ -98,12 +98,14 @@ IZinxMsg *TimerOutMsg::InternelHandle(IZinxMsg &_oInput){
     // 移动刻度
     cur_index++;
     cur_index %=10;
+    list<TimerOutProc*> m_cache;
     // 判断当前刻度所有节点，指向处理函数或者圈数-1
     for(auto itr = m_timer_wheel[cur_index].begin();itr!= m_timer_wheel[cur_index].end();itr++)
     {
         if((*itr)->iCount <=0)
         {
-            (*itr)->Proc();
+//            (*itr)->Proc();
+            m_cache.push_back(*itr);
             auto tmp=(*itr);
             itr=m_timer_wheel[cur_index].erase(itr);
             AddTask(tmp);
@@ -111,6 +113,12 @@ IZinxMsg *TimerOutMsg::InternelHandle(IZinxMsg &_oInput){
             (*itr)->iCount--;
             ++itr;
         }
+    }
+
+    // 统一待处理超时任务
+    for (auto task:m_cache)
+    {
+        task->Proc();
     }
     return NULL;
 }
@@ -147,7 +155,7 @@ void TimerOutMsg::DelTask(TimerOutProc *_ptask)
 {
     // m_task_list.remove(_ptask);
     // 遍历时间所有齿，删掉任务    
-   for (auto chi:m_timer_wheel)
+   for (list<TimerOutProc*> &chi:m_timer_wheel)
    {
     for(auto task:chi)   
     {
