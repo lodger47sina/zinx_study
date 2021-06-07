@@ -16,6 +16,11 @@ CmdCheck::~CmdCheck()
 
 UserData * CmdCheck::raw2request(std::string _szInput)
 {
+    if("exit" == _szInput)
+    {
+        ZinxKernel::Zinx_Exit();
+        return NULL;
+    }
 	/*赋值原始数据字符串到用户数据中字符串字段*/
 	auto pret = new CmdMsg();
 	pret->szUserData = _szInput;
