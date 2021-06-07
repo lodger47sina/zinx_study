@@ -10,5 +10,9 @@ public:
 	std::string szUserData;
 	CmdMsg();
 	virtual ~CmdMsg();
+
+    bool isOpen = true;
+    bool isCmd = false;
+    bool needDatePre = false;
 };
 

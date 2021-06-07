@@ -5,8 +5,8 @@ class StdInChannel :
 	public Ichannel
 {
 public:
-	StdInChannel();
-	virtual ~StdInChannel();
+	StdInChannel(){}
+	virtual ~StdInChannel(){}
 
 	// 通过 Ichannel 继承
 	virtual bool Init() override;
@@ -21,6 +21,8 @@ public:
 class StdOutChannel :public Ichannel
 {
 public:
+    StdOutChannel(){}
+    ~StdOutChannel(){}
 	// 通过 Ichannel 继承
 	virtual bool Init() override;
 	virtual bool ReadFd(std::string & _input) override;

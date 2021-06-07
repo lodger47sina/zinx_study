@@ -4,15 +4,6 @@
 
 using namespace std;
 
-StdInChannel::StdInChannel()
-{
-}
-
-
-StdInChannel::~StdInChannel()
-{
-}
-
 bool StdInChannel::Init()
 {
 	return true;
