@@ -5,8 +5,8 @@ class StdInChannel :
 	public Ichannel
 {
 public:
-	StdInChannel();
-	virtual ~StdInChannel();
+	StdInChannel(){}
+	virtual ~StdInChannel(){}
 
 	// Í¨¹ý Ichannel ¼Ì³Ð
 	virtual bool Init() override;
@@ -29,4 +29,15 @@ public:
 	virtual int GetFd() override;
 	virtual std::string GetChannelInfo() override;
 	virtual AZinxHandler * GetInputNextStage(BytesMsg & _oInput) override;
+};
+class MyTcpDate :public ZinxTcpData
+{
+public:
+    MyTcpDate(int _fd):ZinxTcpData(_fd){}
+	virtual AZinxHandler * GetInputNextStage(BytesMsg & _oInput);
+};
+class MyFact :public IZinxTcpConnFact{
+public:
+	virtual ZinxTcpData *CreateTcpDataChannel(int _fd);
+
 };

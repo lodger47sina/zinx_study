@@ -4,15 +4,6 @@
 
 using namespace std;
 
-StdInChannel::StdInChannel()
-{
-}
-
-
-StdInChannel::~StdInChannel()
-{
-}
-
 bool StdInChannel::Init()
 {
 	return true;
@@ -45,7 +36,6 @@ std::string StdInChannel::GetChannelInfo()
 
 AZinxHandler * StdInChannel::GetInputNextStage(BytesMsg & _oInput)
 {
-	/*返回协议对象*/
 	return CmdCheck::GetInstance();
 }
 
@@ -82,5 +72,16 @@ std::string StdOutChannel::GetChannelInfo()
 AZinxHandler * StdOutChannel::GetInputNextStage(BytesMsg & _oInput)
 {
 	return nullptr;
+}
+//----------------------------------
+AZinxHandler * MyTcpDate::GetInputNextStage(BytesMsg & _oInput)
+{
+return CmdCheck::GetInstance();
+}
+
+
+ZinxTcpData *MyFact::CreateTcpDataChannel(int _fd)
+{
+return new MyTcpDate(_fd);
 }
 
